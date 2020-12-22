@@ -33,18 +33,18 @@ import (
 //	<- exitChan
 //}
 
-func number (numChan, letterChan chan bool, endNum int) {
+func number(numChan, letterChan chan bool, endNum int) {
 	for i := 1; i <= endNum; i++ {
-		<- numChan
+		<-numChan
 		fmt.Printf("%d", i)
 		letterChan <- true
 	}
 }
 
-func letter (numChan, letterChan, exitChan chan bool, endNum int) {
+func letter(numChan, letterChan, exitChan chan bool, endNum int) {
 	startLetter := 'A'
 	for i := 1; i <= endNum; i++ {
-		<- letterChan
+		<-letterChan
 		fmt.Printf("%c\n", startLetter)
 		startLetter++
 		if i < endNum {
@@ -55,7 +55,7 @@ func letter (numChan, letterChan, exitChan chan bool, endNum int) {
 }
 
 // 交替打印数字以及字母
-func main()  {
+func main() {
 	numChan := make(chan bool)
 	letChan := make(chan bool)
 	exitChan := make(chan bool)
@@ -65,5 +65,5 @@ func main()  {
 	go letter(numChan, letChan, exitChan, endNum)
 
 	numChan <- true
-	<- exitChan
+	<-exitChan
 }
