@@ -21,3 +21,18 @@ func main() {
 	}
 	wg.Wait()
 }
+
+/*
+下面这个案例输入结果和主函数案例有异曲同工之妙
+*/
+func test2() {
+	var wg sync.WaitGroup
+	wg.Add(10)
+	for i := 0; i < 10; i++ {
+		go func() {
+			defer wg.Done()
+			fmt.Println("i = ", i)
+		}()
+	}
+	wg.Wait()
+}
