@@ -28,3 +28,16 @@ func main() {
 	wg.Wait()
 	fmt.Println("count =", count)
 }
+
+// 不会顺序输出，因为goroutine创建和调度不是同时发生的,且调度具有一定的随机性
+func sort() {
+	wg := sync.WaitGroup{}
+	wg.Add(5)
+	for i := 0; i < 5; i++ {
+		go func(i int) {
+			defer wg.Done()
+			fmt.Println(i)
+		}(i)
+	}
+	wg.Wait()
+}
