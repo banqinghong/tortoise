@@ -30,13 +30,11 @@ func (j *Job) Run() bool {
 func Worker(wg *sync.WaitGroup) {
 	for job := range Jobs {
 		execResult := job.Run()
-		execResultStr := ""
+		execResultStr := "failed"
 		if execResult {
 			execResultStr = "successful"
-		} else {
-			execResultStr = "failed"
 		}
-		//fmt.Printf("job id %d, result is %s", job.Id, job.RandNum)
+		//fmt.Printf("job id %d, result is %d\n", job.Id, job.RandNum)
 		result := Result{
 			Job:        job,
 			ExecResult: execResultStr,

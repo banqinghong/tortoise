@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 )
 
 type Driver interface {
@@ -31,13 +30,13 @@ func IsDriver(d Driver) bool {
 	return true
 }
 
-func main() {
-	p1 := Person("banqinghong")
-	qiuqiu := Dog("dog")
-	if IsDriver(p1) {
-		fmt.Printf("%s 会开车\n", p1)
-	}
-	if IsDriver(qiuqiu) {
-		fmt.Printf("%s 不会开车\n", qiuqiu)
-	}
-}
+//func main() {
+//	p1 := Person("banqinghong")
+//	qiuqiu := Dog("dog")
+//	if IsDriver(p1) {
+//		fmt.Printf("%s 会开车\n", p1)
+//	}
+//	if IsDriver(qiuqiu) {
+//		fmt.Printf("%s 不会开车\n", qiuqiu)
+//	}
+//}
