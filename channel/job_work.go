@@ -17,18 +17,16 @@ type Result struct {
 	ExecResult string
 }
 
-var Jobs = make(chan Job, 10)
-var Results = make(chan Result, 10)
-
 func (j *Job) Run() bool {
+	time.Sleep(2 * time.Second)
 	if j.RandNum%2 == 0 {
 		return true
 	}
 	return false
 }
 
-func Worker(wg *sync.WaitGroup) {
-	for job := range Jobs {
+func Worker(wg *sync.WaitGroup, jobs chan Job, results chan Result) {
+	for job := range jobs {
 		execResult := job.Run()
 		execResultStr := "failed"
 		if execResult {
@@ -39,47 +37,55 @@ func Worker(wg *sync.WaitGroup) {
 			Job:        job,
 			ExecResult: execResultStr,
 		}
-		Results <- result
+		results <- result
 	}
 	wg.Done()
 }
 
-func CreateWorkerPool(noOfWorker int) {
+func CreateWorkerPool(noOfWorker int, jobs chan Job, results chan Result) {
 	var wg sync.WaitGroup
 	for i := 0; i < noOfWorker; i++ {
 		wg.Add(1)
-		go Worker(&wg)
+		go Worker(&wg, jobs, results)
 	}
 	wg.Wait()
-	close(Results)
+	close(results)
 }
 
-func Allocate(noOfJob int) {
+func Allocate(noOfJob int, jobs chan Job) {
 	for i := 0; i < noOfJob; i++ {
 		randomNo := rand.Intn(999)
 		job := Job{
 			Id:      i,
 			RandNum: randomNo,
 		}
-		Jobs <- job
+		jobs <- job
 	}
-	close(Jobs)
+	close(jobs)
 }
 
-func CheckResult(done chan bool) {
-	for result := range Results {
+func CheckResult(done chan bool, results chan Result) {
+	for result := range results {
 		fmt.Printf("job detail: id %d, randNum: %d,  result: %s\n", result.Job.Id, result.Job.RandNum, result.ExecResult)
 	}
 	done <- true
 }
 
+func exec() {
+	fmt.Println("exec starting")
+	var jobs = make(chan Job, 10)
+	var results = make(chan Result, 10)
+	go Allocate(30, jobs)
+	done := make(chan bool)
+	go CheckResult(done, results)
+	go CreateWorkerPool(3, jobs, results)
+	<-done
+	fmt.Println("exec ending")
+}
+
 func main() {
 	startTime := time.Now()
-	go Allocate(30)
-	done := make(chan bool)
-	go CheckResult(done)
-	go CreateWorkerPool(3)
-	<-done
+	go exec()
 	endTime := time.Now()
 	diff := endTime.Sub(startTime)
 	fmt.Println("total time taken ", diff.Seconds(), "seconds")
